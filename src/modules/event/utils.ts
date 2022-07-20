@@ -1,4 +1,3 @@
-import fs from 'fs';
 import { Types } from 'mongoose';
 import QRCode, { QRCodeToDataURLOptions } from 'qrcode';
 import sharp, { Sharp } from 'sharp';
@@ -22,8 +21,6 @@ const textToQrBuffer = async (text: string, options: QRCodeToDataURLOptions) => 
   if (!matches) {
     throw new ErrorResponse(undefined, undefined, 'QR code could not be generated');
   }
-
-  fs.writeFileSync('data.png', Buffer.from(matches[2], 'base64'));
 
   return { ext: matches[1], buffer: Buffer.from(matches[2], 'base64') };
 };

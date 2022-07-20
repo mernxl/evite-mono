@@ -6,8 +6,8 @@ import { minioClient } from '../../../config/minio';
 import { DocMetaConfig, ErrorResponse } from '../../../utils';
 import { CryptoServices } from '../../crypto';
 import { CreateOneEventInput } from '../event.types';
-import { IEvent, IEventModel } from './event.types';
 import { getTicketObjectKey } from '../utils';
+import { IEvent, IEventModel } from './event.types';
 
 export type EventStaticsType = typeof EventStatics;
 

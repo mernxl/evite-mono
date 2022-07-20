@@ -29,6 +29,7 @@ export const EventMethods = {
       description: this.description,
 
       ticket: this.ticket,
+      hasTicket: this.hasTicket,
 
       hasKeyword: this.hasKeyword,
 
@@ -37,11 +38,13 @@ export const EventMethods = {
 
       signingKeyIdHash: this.signingKeyIdHash,
 
-      ticketUrl: await minioClient.presignedUrl(
-        'GET',
-        config.EVENT.BUCKET_NAME,
-        getTicketObjectKey(this._id),
-      ),
+      ticketUrl: this.hasTicket
+        ? await minioClient.presignedUrl(
+            'GET',
+            config.EVENT.BUCKET_NAME,
+            getTicketObjectKey(this._id),
+          )
+        : undefined,
       ...viewDocMetaTimeStamp(this),
     };
   },

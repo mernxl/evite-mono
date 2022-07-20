@@ -7,7 +7,6 @@ import helmet from 'helmet';
 import mLogger from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 
-// TODO: import { setUpMediaEndpoints } from '../modules/media';
 import { RegisterRoutes } from '../routes/routes';
 import swaggerSchema from '../routes/swagger.json';
 import { config } from './config';

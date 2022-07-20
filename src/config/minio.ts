@@ -6,8 +6,8 @@ import { wLogger } from './winston';
 export const minioClient = new Minio.Client({
   endPoint: config.minio.endpoint,
   port: config.minio.port,
-  useSSL: true,
-  region: config.minio.region,
+  region: config.MINIO_REGION,
+  useSSL: !!config.MINIO_USE_SSL,
   accessKey: config.minio.accessKey,
   secretKey: config.minio.secretKey,
 });

@@ -12,6 +12,9 @@ export interface AppConfiguration {
   REVERSE_PROXY: boolean;
   MONGODB_USE_IN_MEMORY_DB?: boolean;
 
+  MINIO_REGION?: string;
+  MINIO_USE_SSL?: string;
+
   CRYPTO: {
     SYSTEM_SECRET: string;
   };
@@ -39,7 +42,6 @@ export interface AppConfiguration {
   minio: {
     endpoint: string;
     port: number;
-    region?: string;
     accessKey: string;
     secretKey: string;
   };

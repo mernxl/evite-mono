@@ -1,4 +1,4 @@
-import { generateKeyPair, generateKeyPairSync } from 'crypto';
+import { generateKeyPair } from 'crypto';
 import fernet from 'fernet';
 import { Types } from 'mongoose';
 import { promisify } from 'util';

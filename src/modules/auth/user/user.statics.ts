@@ -1,9 +1,6 @@
 import { ClientSession, Query, Types } from 'mongoose';
 import { isEmpty } from 'ramda';
 
-import { config } from '../../../config';
-import { mailer } from '../../../config/notify';
-import { wLogger } from '../../../config/winston';
 import {
   ErrorResponse,
   isEmailValid,
