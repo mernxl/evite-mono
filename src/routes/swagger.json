@@ -1,0 +1,1099 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"Authorization": {
+				"properties": {
+					"userId": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"sessionId": {
+						"type": "string"
+					},
+					"accessToken": {
+						"type": "string"
+					},
+					"refreshToken": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"userId",
+					"email",
+					"sessionId",
+					"accessToken",
+					"refreshToken"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AuthSignUpInput": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"email",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AuthSignInInput": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserBase": {
+				"properties": {
+					"_id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"_id",
+					"name",
+					"email"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IDocMetaTimestamp": {
+				"properties": {
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					}
+				},
+				"required": [
+					"createdAt",
+					"updatedAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"User": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/UserBase"
+					},
+					{
+						"$ref": "#/components/schemas/IDocMetaTimestamp"
+					}
+				]
+			},
+			"AuthMeUpdateInput": {
+				"description": "Update a users information",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AuthUpdatePasswordInput": {
+				"properties": {
+					"cur_password": {
+						"type": "string",
+						"description": "Current Password"
+					},
+					"new_password": {
+						"type": "string",
+						"description": "New Password to use."
+					}
+				},
+				"required": [
+					"cur_password",
+					"new_password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AuthRequestPasswordResetInput": {
+				"properties": {
+					"email": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AuthResetPasswordInput": {
+				"properties": {
+					"reset_token": {
+						"type": "string",
+						"description": "Gotten after calling request-password-reset route\n\nIf reset code already verified, then no need to send resetToken but obj needed"
+					},
+					"new_password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"reset_token",
+					"new_password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AuthIsTokenValidInput": {
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [
+							"access",
+							"refresh"
+						]
+					},
+					"token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"type",
+					"token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"EventTicketMeta": {
+				"properties": {
+					"qrSize": {
+						"type": "string"
+					},
+					"qrPosition": {
+						"properties": {
+							"y": {
+								"type": "string"
+							},
+							"x": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"y",
+							"x"
+						],
+						"type": "object"
+					}
+				},
+				"required": [
+					"qrSize",
+					"qrPosition"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"EventBase": {
+				"properties": {
+					"_id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"ticket": {
+						"$ref": "#/components/schemas/EventTicketMeta"
+					},
+					"hasTicket": {
+						"type": "boolean"
+					},
+					"hasKeyword": {
+						"type": "boolean"
+					},
+					"organizerId": {
+						"type": "string"
+					},
+					"authorityIds": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"signingKeyIdHash": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"_id",
+					"name",
+					"hasKeyword",
+					"organizerId",
+					"authorityIds",
+					"signingKeyIdHash"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"EventPopulated": {
+				"properties": {
+					"ticketUrl": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Event": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/EventBase"
+					},
+					{
+						"$ref": "#/components/schemas/EventPopulated"
+					},
+					{
+						"$ref": "#/components/schemas/IDocMetaTimestamp"
+					}
+				]
+			},
+			"CreateOneEventInput": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"ticket": {
+						"properties": {
+							"qrPosition": {
+								"properties": {
+									"y": {
+										"type": "string"
+									},
+									"x": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"y",
+									"x"
+								],
+								"type": "object"
+							},
+							"qrSize": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"qrPosition",
+							"qrSize"
+						],
+						"type": "object"
+					},
+					"keyword": {
+						"type": "string"
+					},
+					"authorityIds": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"EviteActivityType": {
+				"enum": [
+					"check-in",
+					"check-out",
+					"cancelled"
+				],
+				"type": "string"
+			},
+			"EviteBase": {
+				"properties": {
+					"_id": {
+						"type": "string"
+					},
+					"eventId": {
+						"type": "string"
+					},
+					"hasKeyword": {
+						"type": "boolean"
+					},
+					"signatureIdHash": {
+						"type": "string"
+					},
+					"activity": {
+						"items": {
+							"properties": {
+								"timestamp": {
+									"type": "string",
+									"format": "date-time"
+								},
+								"data": {
+									"type": "string"
+								},
+								"type": {
+									"$ref": "#/components/schemas/EviteActivityType"
+								}
+							},
+							"required": [
+								"timestamp",
+								"type"
+							],
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"_id",
+					"eventId",
+					"hasKeyword",
+					"signatureIdHash",
+					"activity"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"DocMetaUserAction": {
+				"properties": {
+					"createdById": {
+						"type": "string"
+					},
+					"updatedById": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"createdById"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Evite": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/EviteBase"
+					},
+					{
+						"$ref": "#/components/schemas/DocMetaUserAction"
+					},
+					{
+						"$ref": "#/components/schemas/IDocMetaTimestamp"
+					}
+				]
+			},
+			"CreateOneEviteInput": {
+				"properties": {
+					"eventId": {
+						"type": "string"
+					},
+					"keyword": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"eventId"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"VerifyEviteOutput": {
+				"properties": {
+					"isValid": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"isValid"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"VerifyEviteInput": {
+				"properties": {
+					"eviteId": {
+						"type": "string"
+					},
+					"keyword": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"eviteId"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"EviteTicketOutput": {
+				"properties": {
+					"eviteId": {
+						"type": "string"
+					},
+					"url": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"eviteId",
+					"url"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {
+			"Bearer": {
+				"type": "apiKey",
+				"name": "Authorization",
+				"in": "header"
+			}
+		}
+	},
+	"info": {
+		"title": "evite-mono",
+		"version": "1.0.0",
+		"description": "Evite Mono Backend",
+		"license": {
+			"name": "MIT"
+		},
+		"contact": {
+			"name": "mernxl ",
+			"email": "mernxl@gmail.com"
+		}
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/auth/sign-up": {
+			"post": {
+				"operationId": "SignUp",
+				"responses": {
+					"200": {
+						"description": "User Authorization Credentials",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Authorization"
+								}
+							}
+						}
+					}
+				},
+				"description": "Create User in System",
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthSignUpInput"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/sign-in": {
+			"post": {
+				"operationId": "SignIn",
+				"responses": {
+					"200": {
+						"description": "User Authorization Credentials",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Authorization"
+								}
+							}
+						}
+					}
+				},
+				"description": "Create User Authorization credential",
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthSignInInput"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/sign-out": {
+			"delete": {
+				"operationId": "SignOut",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"description": "Terminates a session, nullifies the refresh token",
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Authorization",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/auth/me": {
+			"get": {
+				"operationId": "Index",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get the current user information. Details of the requester.",
+				"tags": [
+					"Auth"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": []
+			},
+			"patch": {
+				"operationId": "MePut",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						}
+					}
+				},
+				"summary": "Update user information, must be authenticated.",
+				"tags": [
+					"Auth"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthMeUpdateInput"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/me/email": {
+			"put": {
+				"operationId": "MeEmailPut",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"summary": "Update user Email",
+				"tags": [
+					"Auth"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"email": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"email"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/update-password": {
+			"post": {
+				"operationId": "UpdatePassword",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"description": "Update user password, Should posses an authentication token, else 401.",
+				"tags": [
+					"Auth"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthUpdatePasswordInput"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/request-password-reset": {
+			"post": {
+				"operationId": "RequestPasswordReset",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"description": "## NOTE\nCurrently, an email with a generated Password is sent. Token generate is not sent as of this version.\n\nRequest a password reset. A token will be sent to the provided email address,\non presenting that token, one can reset account.\n\nToken has a validity period of 20 Minutes after which you will need to request new token to reset password.",
+				"summary": "Request a password reset, new password is generated and sent.",
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthRequestPasswordResetInput"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/reset-password": {
+			"post": {
+				"operationId": "ResetPassword",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"description": "Reset a password, using a reset token.\n\nTo reset, we need pass either token, generated and send via email",
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthResetPasswordInput"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/refresh-access-token": {
+			"get": {
+				"operationId": "RefreshAccessToken",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Authorization"
+								}
+							}
+						}
+					}
+				},
+				"description": "Refresh Access token, old one could still be used until it expires.",
+				"summary": "Refresh access token",
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "RefreshToken that will be used to refresh access token",
+						"in": "header",
+						"name": "X-Auth",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/auth/is-token-valid": {
+			"post": {
+				"operationId": "IsTokenValid",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "boolean"
+								}
+							}
+						}
+					}
+				},
+				"description": "Verify if a token is valid, it may be an access or refresh token.\n\nUseful when deciding whether to redirect to signin when a 401 response\nis ever received.",
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthIsTokenValidInput"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/crypto/sign": {
+			"post": {
+				"operationId": "Sign",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Crypto"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/crypto/verify": {
+			"post": {
+				"operationId": "Verify",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Crypto"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/events": {
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Event"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Event"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateOneEventInput"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/events/{eventId}/tickets": {
+			"put": {
+				"operationId": "UpdateTicket",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Event"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "eventId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"image": {
+										"type": "string",
+										"format": "binary"
+									}
+								},
+								"required": [
+									"image"
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		"/events/evites": {
+			"post": {
+				"operationId": "EviteCreate",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Evite"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Event"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateOneEviteInput"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/events/evites/verify": {
+			"post": {
+				"operationId": "EviteVerify",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/VerifyEviteOutput"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Event"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/VerifyEviteInput"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/events/evites/{eviteId}/ticket": {
+			"get": {
+				"operationId": "EviteTicket",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/EviteTicketOutput"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Event"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "eviteId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}
