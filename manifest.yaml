@@ -1,3 +1,40 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: evite-mono
+  labels:
+    name: evite-mono
+    istio-injection: enabled
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: evite-config
+  namespace: evite-mono
+data:
+  AUTH_JWT_SECRET: wb0GVijnquSCyRy7tte5kv7XfyVol9CoJozcZcKcKEI=
+  EVENT_BUCKET_NAME: evites-mono--events-dev
+  CRYPTO_SYSTEM_SECRET: wb0GVijnquSCyRy7tte5kv7XfyVol9CoJozcZcKcKEI=
+
+  # MINIO_ENDPOINT: s3.eu-north-1.amazonaws.com
+  # MINIO_REGION: eu-north-1
+  # MINIO_USE_SSL: True
+  # MINIO_PORT: 443
+  # MINIO_ACCESS_KEY: AKIA2IVUZ7AA5LKQDKUD
+  # MINIO_SECRET_KEY: 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
+
+  MINIO_ENDPOINT: minio.minio.svc.cluster.local
+  MINIO_REGION: cm-north-1
+  MINIO_USE_SSL: 'True'
+  MINIO_PORT: '9000'
+  MINIO_ACCESS_KEY: root
+  MINIO_SECRET_KEY: e3R6SCf404dif-Nm
+
+  MONGODB_URL: mongodb://mongodb-0.mongodb-headless.mongodb.svc.cluster.local:27017,mongodb-1.mongodb-headless.mongodb.svc.cluster.local:27017,mongodb-2.mongodb-headless.mongodb.svc.cluster.local:27017/?replicaSet=rs0
+  MONGODB_USER_NAME: root
+  MONGODB_USER_PASS: e3R6SCf404dif-Nm
+
+---
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
@@ -13,7 +50,6 @@ spec:
         protocol: HTTP
       hosts:
         - "evite-mono.com"
-        - "www.evite-mono.com"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -23,7 +59,6 @@ metadata:
 spec:
   hosts:
     - "evite-mono.com"
-    - "www.evite-mono.com"
   gateways:
     - evite-mono-gateway
   http:
@@ -73,20 +108,67 @@ spec:
           image: registry.gitlab.com/mernxl-evite/evite-mono:latest
           imagePullPolicy: IfNotPresent
           env:
+            - name: JWT_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: evite-config
+                  key: AUTH_JWT_SECRET
+            - name: EVENT_BUCKET_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: evite-config
+                  key: EVENT_BUCKET_NAME
             - name: MONGODB_USER_NAME
-              value: root
+              valueFrom:
+                configMapKeyRef:
+                  name: evite-config
+                  key: MONGODB_USER_NAME
             - name: MONGODB_USER_PASS
-              value: e3R6SCf404dif-Nm
+              valueFrom:
+                configMapKeyRef:
+                  name: evite-config
+                  key: MONGODB_USER_PASS
             - name: MONGODB_URL
-              value: mongodb://mongodb-0.mongodb-headless.mongodb.svc.cluster.local:27017,mongodb-1.mongodb-headless.mongodb.svc.cluster.local:27017,mongodb-2.mongodb-headless.mongodb.svc.cluster.local:27017/?replicaSet=rs0
+              valueFrom:
+                configMapKeyRef:
+                  name: evite-config
+                  key: MONGODB_URL
+            - name: MINIO_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: evite-config
+                  key: MINIO_ENDPOINT
+            - name: MINIO_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: evite-config
+                  key: MINIO_REGION
+            - name: MINIO_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: evite-config
+                  key: MINIO_PORT
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: evite-config
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: evite-config
+                  key: MINIO_SECRET_KEY
+
             - name: SERVER_HOST
               value: 0.0.0.0
             - name: SERVER_PORT
               value: "4020"
             - name: NODE_ENV
               value: production
-            - name: JWT_SECRET
-              value: wb0GVijnquSCyRy7tte5kv7XfyVol9CoJozcZcKcKEI=
+            - name: SMTP_USER_PASS
+              value: ""
+            - name: SMTP_USER_NAME
+              value: ""
           ports:
             - containerPort: 4020
 ---

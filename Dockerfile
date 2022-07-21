@@ -28,7 +28,7 @@ COPY yarn.lock .
 RUN yarn install --production
 
 COPY --from=build /app/build ./build
-COPY app.ini app.local.ini ./
+COPY app.ini ./
 
 EXPOSE 4020
 
