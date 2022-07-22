@@ -16,8 +16,3 @@ build:
     - echo $IMAGE_TAG
     - docker tag $IMAGE_TAG $IMAGE_TAG_LATEST
     - docker push $IMAGE_TAG_LATEST
-  rules:
-    - if: $CI_PIPELINE_SOURCE != "web" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        - Dockerfile
-        - .gitlab-ci.yml
