@@ -106,7 +106,7 @@ spec:
       containers:
         - name: evite-mono
           image: registry.gitlab.com/mernxl-evite/evite-mono:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: JWT_SECRET
               valueFrom:
