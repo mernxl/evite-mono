@@ -1,6 +1,3 @@
-import './signature';
-import './signing-key';
-
 import { Controller, Get, Route, Tags } from 'tsoa';
 
 import { config } from '../../config';

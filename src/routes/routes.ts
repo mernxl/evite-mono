@@ -8,6 +8,8 @@ import { AuthController } from './../modules/auth/auth.controller';
 import { CryptoController } from './../modules/crypto/crypto.controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { EventController } from './../modules/event/event.controller';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { HealthController } from './../modules/health/health.controller';
 import { expressAuthentication } from './../config/authorization';
 // @ts-ignore - no great way to install types from subpackage
 const promiseAny = require('promise.any');
@@ -716,6 +718,30 @@ export function RegisterRoutes(app: express.Router) {
 
 
               const promise = controller.eviteTicket.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/health',
+            ...(fetchMiddlewares<RequestHandler>(HealthController)),
+            ...(fetchMiddlewares<RequestHandler>(HealthController.prototype.health)),
+
+            function HealthController_health(request: any, response: any, next: any) {
+            const args = {
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new HealthController();
+
+
+              const promise = controller.health.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
