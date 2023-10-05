@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 import { find } from 'ramda';
 
 import { config } from '../../../config';
-import { minioClient } from '../../../config/minio';
+import { getPresignedUrl } from '../../../config/aws';
 import { ForbiddenError, viewDocMetaTimeStamp } from '../../../utils';
 import { Event } from '../event.types';
 import { getTicketObjectKey } from '../utils';
@@ -39,10 +39,10 @@ export const EventMethods = {
       signingKeyIdHash: this.signingKeyIdHash,
 
       ticketUrl: this.hasTicket
-        ? await minioClient.presignedUrl(
-            'GET',
+        ? await getPresignedUrl(
             config.EVENT.BUCKET_NAME,
             getTicketObjectKey(this._id),
+            60 * 60 * 24 * 5, // 5 days
           )
         : undefined,
       ...viewDocMetaTimeStamp(this),

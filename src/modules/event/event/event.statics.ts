@@ -1,8 +1,9 @@
+import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { Types } from 'mongoose';
 import { File } from 'tsoa';
 
 import { config } from '../../../config';
-import { minioClient } from '../../../config/minio';
+import { s3Client } from '../../../config/aws';
 import { DocMetaConfig, ErrorResponse } from '../../../utils';
 import { CryptoServices } from '../../crypto';
 import { CreateOneEventInput } from '../event.types';
@@ -49,14 +50,14 @@ export const EventStatics = {
   async saveTicketImage(this: IEventModel, eventId: string | Types.ObjectId, image: File) {
     const event = await this.getById(eventId);
 
-    await minioClient.putObject(
-      config.EVENT.BUCKET_NAME,
-      getTicketObjectKey(event._id),
-      image.buffer,
-      {
-        'Content-Type': image.mimetype,
-      },
-    );
+    const command = new PutObjectCommand({
+      Bucket: config.EVENT.BUCKET_NAME,
+      Key: getTicketObjectKey(event._id),
+      Body: image.buffer,
+      ContentType: image.mimetype,
+    });
+
+    await s3Client.send(command);
 
     event.hasTicket = true;
 

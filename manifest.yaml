@@ -113,6 +113,11 @@ spec:
                 configMapKeyRef:
                   name: evite-config
                   key: AUTH_JWT_SECRET
+            - name: CRYPTO_SYSTEM_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: evite-config
+                  key: CRYPTO_SYSTEM_SECRET
             - name: EVENT_BUCKET_NAME
               valueFrom:
                 configMapKeyRef:

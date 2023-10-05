@@ -1,8 +1,9 @@
+import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { Types } from 'mongoose';
 import * as os from 'os';
 
 import { config } from '../../../config';
-import { minioClient } from '../../../config/minio';
+import { downloadS3File, getPresignedUrl, s3Client } from '../../../config/aws';
 import { DocMetaConfig, ErrorResponse } from '../../../utils';
 import { CryptoServices } from '../../crypto';
 import { EventServices } from '../event.config';
@@ -89,23 +90,23 @@ export const EviteStatics = {
     }
 
     const filePath = `${os.tmpdir()}/${getTicketObjectKey(event._id)}`;
-    await minioClient.fGetObject(config.EVENT.BUCKET_NAME, getTicketObjectKey(event._id), filePath);
+    await downloadS3File(config.EVENT.BUCKET_NAME, getTicketObjectKey(event._id), filePath);
 
     const sharp = await composeDataAsQROnImage(evite._id.toHexString(), filePath, event.ticket);
 
-    await minioClient.putObject(
-      config.EVENT.BUCKET_NAME,
-      getEviteObjectKey(evite._id),
-      sharp.png(),
-      {
-        'Content-Type': 'image/png',
-      },
-    );
+    const command = new PutObjectCommand({
+      Bucket: config.EVENT.BUCKET_NAME,
+      Key: getEviteObjectKey(evite._id),
+      Body: sharp.png(),
+      ContentType: 'image/png',
+    });
 
-    const url = await minioClient.presignedUrl(
-      'GET',
+    await s3Client.send(command);
+
+    const url = await getPresignedUrl(
       config.EVENT.BUCKET_NAME,
       getEviteObjectKey(evite._id),
+      60 * 60, // 60 minutes (secs)
     );
 
     return { eviteId: evite._id.toHexString(), url };

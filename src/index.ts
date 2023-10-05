@@ -6,11 +6,9 @@ import { app } from './config/express';
 const runInCluster = false;
 const listen = () => {
   // Bind to a port
-  app.listen(config.SERVER_PORT, config.SERVER_HOST, () => {
+  app.listen(config.PORT, config.HOST, () => {
     // eslint-disable-next-line no-console
-    console.log(
-      `🚀 Server started on http://${config.SERVER_HOST}:${config.SERVER_PORT} (${config.NODE_ENV})`,
-    );
+    console.log(`🚀 Server started on http://${config.HOST}:${config.PORT} (${config.NODE_ENV})`);
   });
 };
 

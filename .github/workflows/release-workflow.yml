@@ -1,0 +1,65 @@
+name: Make a Release to ECR
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (input including preceding v), defaults to commit sha"
+        default: null
+
+jobs:
+  release:
+    name: Release ECR, Tags if on main branch and version input valid
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Tag and Release version on Github
+        uses: avakar/tag-and-release@v1
+        if: ${{ github.ref_name == 'main' && inputs.version != null }}
+        with:
+          tag_name: "${{ inputs.version }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Emit Image Tag
+        id: emit-tag
+        if: ${{ startsWith(inputs.version, 'v') }}
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          # remove the v prefix from the tag
+          TAG=${VERSION#*v}
+          echo "imageTag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Get short SHA, if not using a version
+        if: ${{ github.ref_name != 'main' || inputs.version == null }}
+        id: sha7
+        run: echo "::set-output name=sha7::$(echo ${GITHUB_SHA} | cut -c1-7)"
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.sha7.outputs.sha7 || steps.emit-tag.outputs.imageTag || inputs.version }} # if version passed but not main
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+        run: |
+          # Build a docker container and
+          # push it to ECR so that it can
+          # be deployed to ECS.
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT

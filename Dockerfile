@@ -32,4 +32,4 @@ COPY app.ini ./
 
 EXPOSE 4020
 
-ENTRYPOINT [ "yarn", "run", "run" ]
+ENTRYPOINT [ "yarn", "run", "run:release" ]

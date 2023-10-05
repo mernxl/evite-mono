@@ -1,0 +1,108 @@
+name: Deploy ECS
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to deploy (input including preceding v). or Commit sha to deploy, only for dev environments.
+        required: true
+      environment:
+        type: choice
+        description: Specify an Environment to run in.
+        default: dev
+        options:
+          - dev
+          - prod
+
+env:
+  APP_NAME: evite-mono
+  PROJECT_NAME: evite
+
+jobs:
+  deploy:
+    name: Deploy ECS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Check version input
+        if: ${{ inputs.environment != 'dev' && github.ref_name != 'main' && startsWith(inputs.version, 'v') }}
+        run: |
+          echo "Deployments to higher environments, should use the main branch and the tag should be prefixed with a v"
+          exit 1
+
+      - name: Emit Image Tag
+        id: emit-tag
+        if: ${{ startsWith(inputs.version, 'v') }}
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          # remove the v prefix from the tag
+          TAG=${VERSION#*v}
+          echo "imageTag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS credentials Dev
+        uses: aws-actions/configure-aws-credentials@v1
+        if: ${{ inputs.environment == 'dev' }}
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Configure AWS credentials Prod
+        uses: aws-actions/configure-aws-credentials@v1
+        if: ${{ inputs.environment == 'prod' }}
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+          aws-region: ${{ vars.AWS_REGION_PROD }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+        with:
+          registries: ${{ vars.ECR_REGISTRY_ID }}
+
+      - name: Fetch Task Definition
+        id: fetch-task-definition
+        env:
+          TASK_DEFINITION_NAME: "${{ env.APP_NAME }}-${{ inputs.environment }}"
+        run: |
+          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition "$TASK_DEFINITION_NAME" | jq ".taskDefinition")
+          TASK_DEFINITION_PATH="task-definition.json"
+          touch $TASK_DEFINITION_PATH
+          echo $TASK_DEFINITION > $TASK_DEFINITION_PATH
+          echo "taskDefinition=$TASK_DEFINITION_PATH" >> $GITHUB_OUTPUT
+
+      - name: Check for Image existense
+        id: check-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.emit-tag.outputs.imageTag || inputs.version }}
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          IMAGE_META="$(aws ecr describe-images --repository-name=$ECR_REPOSITORY --image-ids=imageTag=$IMAGE_TAG 2> /dev/null)"
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ steps.fetch-task-definition.outputs.taskDefinition }}
+          container-name: ${{ env.APP_NAME }}
+          image: ${{ steps.check-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: "${{ env.APP_NAME }}-${{ inputs.environment }}"
+          cluster: "${{ env.PROJECT_NAME }}-${{ inputs.environment }}"
+          wait-for-service-stability: true
