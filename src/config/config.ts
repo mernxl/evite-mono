@@ -12,6 +12,9 @@ export interface AppConfiguration {
   REVERSE_PROXY: boolean;
   MONGODB_USE_IN_MEMORY_DB?: boolean;
 
+  NEW_RELIC_API_KEY: string;
+  NEW_RELIC_OTEL_ENDPOINT: string;
+
   CRYPTO: {
     SYSTEM_SECRET: string;
   };

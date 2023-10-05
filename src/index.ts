@@ -1,3 +1,5 @@
+import './config/instrumentation';
+
 import cluster from 'cluster';
 
 import { config } from './config';
