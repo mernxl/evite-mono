@@ -1,7 +1,4 @@
-import { NODE_ENV } from '@xelgrp/configu';
 import * as winston from 'winston';
-
-import { config as envConfig } from './config';
 
 const config = (end: string) => ({
   fileError: {
@@ -41,9 +38,9 @@ const logger = winston.createLogger({
 });
 
 // register a console logger, no console logger if not development and not behind reverse proxy
-if (!envConfig.REVERSE_PROXY && envConfig.NODE_ENV === NODE_ENV.DEVELOPMENT) {
-  logger.add(new winston.transports.Console(config('back').consoleLogs));
-}
+/*if (!envConfig.REVERSE_PROXY && envConfig.NODE_ENV === NODE_ENV.DEVELOPMENT) {
+  logger.add(new winston.transports.Console(config('back').consoleLogs)); logging in containers
+}*/
 
 // stream for morgan
 const mLoggerStream = {
