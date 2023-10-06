@@ -31,16 +31,17 @@ const logLevels = { fatal: 0, error: 1, warn: 2, info: 3, verbose: 4, debug: 5, 
 const logger = winston.createLogger({
   levels: logLevels,
   transports: [
-    new winston.transports.File(config('back').fileError),
-    new winston.transports.File(config('back').fileCombined),
+    //new winston.transports.File(config('back').fileError),
+    //new winston.transports.File(config('back').fileCombined),
+    new winston.transports.Console(config('back').consoleLogs),
   ],
   exitOnError: false,
 });
 
-// register a console logger, no console logger if not development and not behind reverse proxy
-/*if (!envConfig.REVERSE_PROXY && envConfig.NODE_ENV === NODE_ENV.DEVELOPMENT) {
-  logger.add(new winston.transports.Console(config('back').consoleLogs)); logging in containers
-}*/
+// // register a console logger, no console logger if not development and not behind reverse proxy
+// if (!envConfig.REVERSE_PROXY && envConfig.NODE_ENV === NODE_ENV.DEVELOPMENT) {
+//   logger.add(new winston.transports.Console(config('back').consoleLogs));
+// }
 
 // stream for morgan
 const mLoggerStream = {

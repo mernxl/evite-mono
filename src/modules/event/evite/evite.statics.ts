@@ -10,6 +10,8 @@ import { EventServices } from '../event.config';
 import { CreateOneEviteInput, EviteTicketOutput, VerifyEviteInput } from '../event.types';
 import { composeDataAsQROnImage, getEviteObjectKey, getTicketObjectKey } from '../utils';
 import { IEvite, IEviteModel } from './evite.types';
+import { mkdir, mkdtemp } from 'fs';
+import { promisify } from 'util';
 
 export type EviteStaticsType = typeof EviteStatics;
 
@@ -90,6 +92,10 @@ export const EviteStatics = {
     }
 
     const filePath = `${os.tmpdir()}/${getTicketObjectKey(event._id)}`;
+    // ensure tickets dir
+    await promisify(mkdir)(filePath.substring(0, filePath.lastIndexOf('/')), {
+      recursive: true,
+    });
     await downloadS3File(config.EVENT.BUCKET_NAME, getTicketObjectKey(event._id), filePath);
 
     const sharp = await composeDataAsQROnImage(evite._id.toHexString(), filePath, event.ticket);
@@ -97,7 +103,7 @@ export const EviteStatics = {
     const command = new PutObjectCommand({
       Bucket: config.EVENT.BUCKET_NAME,
       Key: getEviteObjectKey(evite._id),
-      Body: sharp.png(),
+      Body: await sharp.png().toBuffer(),
       ContentType: 'image/png',
     });
 

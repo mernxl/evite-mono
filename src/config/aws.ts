@@ -45,9 +45,11 @@ export async function downloadS3File(
 
     // Create a write stream to save the file locally
     const fileStream = createWriteStream(dist_path);
+
+    const readableStream = response.Body!;
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    response.Body.pipe(fileStream);
+    readableStream.pipe(fileStream);
 
     return new Promise((resolve, reject) => {
       fileStream.on('finish', resolve);
